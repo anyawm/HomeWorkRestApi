@@ -26,23 +26,7 @@ public class ReqresInTests {
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body("token", is("QpwL5tke4Pnpja7X4"));
-    }
-
-    @Test
-    void registerTestId() {
-        String data = "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\" }";
-
-        given()
-                .log().uri()
-                .contentType(JSON)
-                .body(data)
-                .when()
-                .post("https://reqres.in/api/register")
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
+                .body("token", is("QpwL5tke4Pnpja7X4"))
                 .body("id", is(4));
     }
 
@@ -106,4 +90,19 @@ public class ReqresInTests {
                 .statusCode(404);
     }
 
+    /*
+       1. Make DELETE request to https://reqres.in/api/users/2
+       2. Check statusCode is 204
+    */
+            @Test
+            void DeleteAccTest() {
+                given()
+                        .log().uri()
+                        .when()
+                        .delete("https://reqres.in/api/users/2")
+                        .then()
+                        .log().status()
+                        .log().body()
+                        .statusCode(204);
+            }
 }
