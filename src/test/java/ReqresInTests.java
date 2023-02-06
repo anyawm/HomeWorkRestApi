@@ -10,7 +10,7 @@ public class ReqresInTests {
         1. Make POST request to https://reqres.in/api/register
             with body { "email": "eve.holt@reqres.in", "password": "pistol" }
         2. Get response { "id": 4, "token": "QpwL5tke4Pnpja7X4" }
-        3. Check token is QpwL5tke4Pnpja7X4, id 4
+        3. Check token is notNullValue, id 4
      */
 
     @Test
