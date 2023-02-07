@@ -1,9 +1,10 @@
+import lombok.LombokUserData;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ReqresInTests {
  /*
@@ -18,17 +19,17 @@ public class ReqresInTests {
         String data = "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\" }";
 
         given()
-                .log().uri()
-                .contentType(JSON)
+                .spec(Specs.request)
                 .body(data)
                 .when()
-                .post("https://reqres.in/api/register")
+                .post("/register")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
+                .spec(Specs.responseSpec)
                 .body("token", notNullValue())
                 .body("id", is(4));
+
     }
 
     @Test
@@ -36,11 +37,10 @@ public class ReqresInTests {
         String data = "{ \"email\": \"eve.holt@reqres.in\"}";
 
         given()
-                .log().uri()
-                .contentType(JSON)
+                .spec(Specs.request)
                 .body(data)
                 .when()
-                .post("https://reqres.in/api/register")
+                .post("/register")
                 .then()
                 .log().status()
                 .log().body()
@@ -56,39 +56,36 @@ public class ReqresInTests {
     */
 
     @Test
-    void updateDataTest() {
-        String data2 = "{ \"name\": \"morpheus\", \"job\": \"zion resident\" }";
+    void updateInfoTest() {
 
-        given()
-                .log().uri()
-                .contentType(JSON)
-                .body(data2)
+        String infoBody = "{ \"name\": \"morpheus\", \"job\": \"zion resident\", \"updatedAt\": \"2023-02-07T16:18:57.052Z\" }";
+
+        LombokUserData data = given()
+                .spec(Specs.request)
                 .when()
-                .put("https://reqres.in/api/users/2")
+                .body(infoBody)
+                .put("/users/2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("name", is("morpheus"));
+                .spec(Specs.responseSpec)
+                .log().all()
+                .extract().as(LombokUserData.class);
     }
 
         /*
-       1. Make PUT request to https://reqres.in/api/unknown/23
+       1. Make GET request to https://reqres.in/api/users
        2. Get response { }
-       3. Check statusCode is 404
+       3. Check statusCode is 200 and Last_Name is Morris
     */
 
     @Test
-    void userNotFoundTest() {
-
+    public void checkUsersWithGroove() {
         given()
-                .log().uri()
+                .spec(Specs.request)
                 .when()
-                .get("https://reqres.in/api/unknown/23")
+                .get("/users")
                 .then()
-                .log().status()
                 .log().body()
-                .statusCode(404);
+                .body("data.findAll{it.id == 5}.last_name", hasItem("Morris"));
     }
 
     /*
@@ -98,12 +95,27 @@ public class ReqresInTests {
             @Test
             void deleteAccTest() {
                 given()
-                        .log().uri()
+                        .spec(Specs.request)
                         .when()
-                        .delete("https://reqres.in/api/users/2")
+                        .delete("/users/2")
                         .then()
                         .log().status()
                         .log().body()
                         .statusCode(204);
             }
+
+
+    @Test
+    public void resourcesListWithGroove() {
+        given()
+                .spec(Specs.request)
+                .when()
+                .get("/unknown")
+                .then().log().body()
+                .body("data.findAll{it.id == 2}.name", hasItem("fuchsia rose"))
+                .body("data.findAll{it.id == 5}.color", hasItem("#E2583E"))
+                .body("data.findAll{it.id == 3}.year", hasItem(2002))
+                .body("support", hasKey("url"))
+                .body("support", hasKey("text"));
+    }
 }
