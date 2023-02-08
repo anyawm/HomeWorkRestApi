@@ -1,8 +1,12 @@
 import lombok.LombokUserData;
+import lombok.UpdateUserModel;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -56,19 +60,39 @@ public class ReqresInTests {
     */
 
     @Test
-    void updateInfoTest() {
-
-        String infoBody = "{ \"name\": \"morpheus\", \"job\": \"zion resident\", \"updatedAt\": \"2023-02-07T16:18:57.052Z\" }";
-
+    void singleUserWithLombokModel() {
+        // @formatter:off
         LombokUserData data = given()
                 .spec(Specs.request)
                 .when()
-                .body(infoBody)
+                .get("/users/2")
+                .then()
+                .spec(Specs.responseSpec)
+                .log().body()
+                .extract().as(LombokUserData.class);
+        // @formatter:on
+        assertEquals(2, data.getUser().getId());
+    }
+
+    @Test
+    void updateUserTest() {
+
+        UpdateUserModel data = new UpdateUserModel();
+        data.setName("morpheus");
+        data.setJob("zion resident");
+        data.setUpdatedAt("2023-02-08T07:06:10.062Z");
+
+        UpdateUserModel updateUserModel = given()
+                .spec(Specs.request)
+                .when()
+                .body(data)
                 .put("/users/2")
                 .then()
                 .spec(Specs.responseSpec)
                 .log().all()
-                .extract().as(LombokUserData.class);
+                .extract().as((Type) UpdateUserModel.class);
+
+        assertThat(updateUserModel.getName(), is("morpheus"));
     }
 
         /*
