@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
-public class DemoworkshopTests {
+public class DemoWorkShopTests {
 
     @BeforeAll
     public static void setUp() {

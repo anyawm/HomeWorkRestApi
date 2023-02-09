@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
 
+import static helpers.CustomApiListener.withCustomTemplates;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,7 +90,6 @@ public class ReqresInTests {
                 .put("/users/2")
                 .then()
                 .spec(Specs.responseSpec)
-                .log().all()
                 .extract().as((Type) UpdateUserModel.class);
 
         assertThat(updateUserModel.getName(), is("morpheus"));
@@ -133,9 +133,11 @@ public class ReqresInTests {
     public void resourcesListWithGroove() {
         given()
                 .spec(Specs.request)
+                .filter(withCustomTemplates())
                 .when()
                 .get("/unknown")
-                .then().log().body()
+                .then()
+                .spec(Specs.responseSpec)
                 .body("data.findAll{it.id == 2}.name", hasItem("fuchsia rose"))
                 .body("data.findAll{it.id == 5}.color", hasItem("#E2583E"))
                 .body("data.findAll{it.id == 3}.year", hasItem(2002))
